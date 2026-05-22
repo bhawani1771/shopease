@@ -1,7 +1,5 @@
-// ---------- Entry point of the backend ----------
-// Loads env vars, connects to MongoDB, mounts routes and starts the server.
-
 require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -20,16 +18,33 @@ const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
-// Make sure the uploads folder exists (for multer)
+// Connect MongoDB
+connectDB();
+
+// Uploads folder create if not exists
 const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 // Middlewares
-app.use(cors({ origin: process.env.CLIENT_URL || "*" }));
 app.use(express.json());
-app.use("/uploads", express.static(uploadsDir)); // serve images publicly
 
-// API routes
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://shopeasee-zeta.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+
+// Static folder
+app.use("/uploads", express.static(uploadsDir));
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
@@ -37,15 +52,18 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
 
-app.get("/", (_req, res) => res.send("E-Commerce API is running"));
+// Test route
+app.get("/", (req, res) => {
+  res.send("E-Commerce API is running...");
+});
 
-// 404 + error handlers (must be last)
+// Error middleware
 app.use(notFound);
 app.use(errorHandler);
 
+// Start server
 const PORT = process.env.PORT || 5000;
 
-// Connect DB then start server
-connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
