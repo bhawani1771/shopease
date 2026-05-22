@@ -8,24 +8,35 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { itemCount } = useCart();
   const { theme, toggle } = useTheme();
+
   const navigate = useNavigate();
+
   const [open, setOpen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [search, setSearch] = useState("");
 
   const onSearch = (e) => {
     e.preventDefault();
+
     navigate(`/products?keyword=${encodeURIComponent(search)}`);
+
     setOpen(false);
   };
 
   return (
     <header className="navbar">
       <div className="container nav-inner">
-        <Link to="/" className="logo" onClick={() => setOpen(false)}>
+
+        {/* Logo */}
+        <Link
+          to="/"
+          className="logo"
+          onClick={() => setOpen(false)}
+        >
           🛍️ ShopEase
         </Link>
 
+        {/* Search */}
         <form className="search" onSubmit={onSearch}>
           <input
             type="text"
@@ -33,49 +44,139 @@ export default function Navbar() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button type="submit">Search</button>
+
+          <button type="submit">
+            Search
+          </button>
         </form>
 
+        {/* Nav Links */}
         <nav className={`nav-links ${open ? "open" : ""}`}>
-          <NavLink to="/" onClick={() => setOpen(false)}>Home</NavLink>
-          <NavLink to="/products" onClick={() => setOpen(false)}>Shop</NavLink>
-          <NavLink to="/about" onClick={() => setOpen(false)}>About</NavLink>
-          <NavLink to="/contact" onClick={() => setOpen(false)}>Contact</NavLink>
 
-          <Link to="/wishlist" className="icon-btn" onClick={() => setOpen(false)}>♡</Link>
-          <Link to="/cart" className="icon-btn cart-btn" onClick={() => setOpen(false)}>
-            🛒 {itemCount > 0 && <span className="badge">{itemCount}</span>}
+          <NavLink
+            to="/"
+            onClick={() => setOpen(false)}
+          >
+            Home
+          </NavLink>
+
+          <NavLink
+            to="/products"
+            onClick={() => setOpen(false)}
+          >
+            Shop
+          </NavLink>
+
+          <NavLink
+            to="/about"
+            onClick={() => setOpen(false)}
+          >
+            About
+          </NavLink>
+
+          <NavLink
+            to="/contact"
+            onClick={() => setOpen(false)}
+          >
+            Contact
+          </NavLink>
+
+          {/* Wishlist */}
+          <Link
+            to="/wishlist"
+            className="icon-btn"
+            onClick={() => setOpen(false)}
+          >
+            ♡
           </Link>
 
-          <button className="icon-btn" onClick={toggle} title="Toggle theme">
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="icon-btn cart-btn"
+            onClick={() => setOpen(false)}
+          >
+            🛒
+
+            {itemCount > 0 && (
+              <span className="badge">
+                {itemCount}
+              </span>
+            )}
+          </Link>
+
+          {/* Theme Toggle */}
+          <button
+            className="icon-btn"
+            onClick={toggle}
+            title="Toggle theme"
+          >
             {theme === "light" ? "🌙" : "☀️"}
           </button>
 
+          {/* User Section */}
           {user ? (
             <div className="dropdown">
-              <button className="btn-ghost" onClick={() => setShowMenu(!showMenu)}>
-                Hi, {user.name.split(" ")[0]} ▾
+
+              <button
+                className="btn-ghost"
+                onClick={() => setShowMenu(!showMenu)}
+              >
+                Hi, {(user?.name || "User").split(" ")[0]} ▾
               </button>
+
               {showMenu && (
-                <div className="dropdown-menu" onClick={() => setShowMenu(false)}>
-                  <Link to="/profile">Profile</Link>
-                  <Link to="/orders">My Orders</Link>
-                  <Link to="/wishlist">Wishlist</Link>
-                  {user.isAdmin && <Link to="/admin">Admin</Link>}
-                  <button onClick={logout}>Logout</button>
+                <div
+                  className="dropdown-menu"
+                  onClick={() => setShowMenu(false)}
+                >
+
+                  <Link to="/profile">
+                    Profile
+                  </Link>
+
+                  <Link to="/orders">
+                    My Orders
+                  </Link>
+
+                  <Link to="/wishlist">
+                    Wishlist
+                  </Link>
+
+                  {user?.isAdmin && (
+                    <Link to="/admin">
+                      Admin
+                    </Link>
+                  )}
+
+                  <button onClick={logout}>
+                    Logout
+                  </button>
+
                 </div>
               )}
             </div>
           ) : (
-            <Link to="/login" className="btn-primary" onClick={() => setOpen(false)}>
+
+            <Link
+              to="/login"
+              className="btn-primary"
+              onClick={() => setOpen(false)}
+            >
               Login
             </Link>
+
           )}
         </nav>
 
-        <button className="hamburger" onClick={() => setOpen(!open)}>
+        {/* Mobile Menu */}
+        <button
+          className="hamburger"
+          onClick={() => setOpen(!open)}
+        >
           ☰
         </button>
+
       </div>
     </header>
   );
